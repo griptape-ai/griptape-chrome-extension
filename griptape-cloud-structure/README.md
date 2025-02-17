@@ -2,11 +2,11 @@
 
 How to deploy.
 
-1. Make sure you have cloned [this repository](https://github.com/ian-griptape-ai/griptape-chrome-extension) into your own GitHub account.
+1. Make sure you have cloned [this repository](https://github.com/griptape-ai/griptape-chrome-extension) into your own GitHub account.
 1. Navigate to [cloud.griptape.ai](https://cloud.griptape.ai) and create a free account. The simplest way is to use your existing Google or GitHub ID to sign up for Griptape Cloud. 
 1. Once logged to Griptape Cloud in you will see the [Griptape Cloud Console](https://cloud.griptape.ai/). Select *Structures* from the menu on the left side.
 ![Griptape console screenshot with the word Structures in the left navigation menu higlighted in yellow dots](./deployment-walkthrough-images/1-select-structures.png)
-1. Click the *Create Structure* button on the top right of the Structures page. Next, click the *Select* button on the *Griptape Structure from GitHub Repo* card.
+1. Click the *Create Structure* button on the top right of the structures page. Next, click the *Select* button on the *Griptape Structure from GitHub Repo* card.
 ![Griptape console screenshot showing the Create Structure page with the Select button on the Griptape Structure from GitHub Repo card higlighted in yellow dots](./deployment-walkthrough-images/2-griptape-structure-from-github-repo.png)
 1. On the next page click the *Manage GitHub Connection* button in the *Create Structure from GitHub* card. You will be taken to the [Account](https://cloud.griptape.ai/account) page. Click the *Connect* button in the GitHub section underneath the *Connections* header.
 ![Griptape console screenshot showing the Account Connections GitHub Connect button highlighted in yellow dots](./deployment-walkthrough-images/3-account-connections-github-connect.png)

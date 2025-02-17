@@ -1,6 +1,6 @@
 # Griptape Chrome Extension
 
-This project is a Chrome extension that provides a panel for interacting with the Griptape Cloud API. The panel allows users to input their API key, the ID for a Griptape Cloud Structure, select options, and submit requests to a Griptape Structure that include the content of the selected browser tab in the request payload.
+This project is a Chrome extension that provides a panel for interacting with the Griptape Cloud API. The panel allows users to input their Griptape Cloud API key, the ID for a Griptape Cloud structure, select options, and submit requests to the Griptape structure that include the content of the selected browser tab in the request payload.
 
 ## Project Structure
 
@@ -23,20 +23,20 @@ This project is a Chrome extension that provides a panel for interacting with th
 
 ## Setup Instructions
 
-1. Clone the repository to your local machine.
-1. Open Chrome and navigate to `chrome://extensions/`.
-1. Enable "Developer mode" in the top right corner.
-1. Click on "Load unpacked" and select the directory containing the extension files.
-1. The extension should now be loaded and visible in your extensions list.
-1. Deploy the Griptape Cloud Structure using the guided walkthrough linked in the next section ⬇
+1. Clone this repository to your local machine
+1. Open Chrome and navigate to `chrome://extensions/`
+1. Enable "Developer mode" in the top right corner
+1. Click on "Load unpacked" and select the directory that you created in step 1, defaults to `griptape-chrome-extension`
+1. The extension should now be loaded and visible in your extensions list
+1. Next: deploy the Griptape Cloud structure using the guided walkthrough linked in the next section ⬇
 
 ## Griptape Cloud Setup
 
-The browser extension requries a Griptape Cloud API key together with a Structure ID for a deployed Structure that will respond to requests from the extension. There is a lot of flexiblity in the precise configuration of the Structure, allowing for experimentation with different models, different prompts and different Tools. 
+The browser extension requries a Griptape Cloud API key together with a structure ID for a deployed structure that will respond to requests from the extension. There is a lot of flexiblity in the precise configuration of the structure, allowing for experimentation with different models, different prompts and different tools. 
 
-A sample Structure is included in [griptape-cloud-structure/structure.py](griptape-cloud-structure/structure.py), together with a guided walkthrough showing you how to deploy that Structure to Griptape Cloud in [griptape-cloud-structure/README.md](griptape-cloud-structure/README.md) 
+A sample structure is included in [griptape-cloud-structure/structure.py](griptape-cloud-structure/structure.py), together with a guided walkthrough showing you how to deploy that structure to Griptape Cloud in [griptape-cloud-structure/README.md](griptape-cloud-structure/README.md) 
 
-In this sample I use an Agent Structure that is initialized as follows:
+In this sample I use an `Agent` structure that is initialized as follows:
 
 ```python
 with GriptapeCloudStructure():
@@ -60,7 +60,7 @@ Note that conversation memory is required for the Quiz Me prompt to function and
 
 1. Click on the extension icon to open the panel. If you want to open the side-panel, which is recommended, right click on the extension icon and select 'Open side panel' from the dropdown menu
 1. Enter your Griptape Cloud API key in the provided field.
-1. Enter the Structure ID for the Griptape Cloud Structure that you wish to invoke  
+1. Enter the structure ID for the Griptape Cloud structure that you wish to invoke  
 1. Select an option from the dropdown menu ("Ask a Question" or "Quiz Me" for example).
 1. Click the submit button to send the content and the prompt to Griptape Cloud.
 1. Results will be displayed in the scrollable area at the bottom of the panel.
