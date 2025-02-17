@@ -12,7 +12,7 @@ import sys
 input = sys.argv[1]
 
 # `GriptapeCloud` will configure the EventBus with `GriptapeCloudEventListenerDriver`
-with GriptapeCloudStructure():
+with GriptapeCloudStructure(observe=True):
     cloud_conversation_driver = GriptapeCloudConversationMemoryDriver(
         api_key=os.environ["GT_CLOUD_API_KEY"],
         alias="griptape_browser_extension_thread",
