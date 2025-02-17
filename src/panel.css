@@ -1,0 +1,68 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: white;
+    background-color: black;
+}
+
+#panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    width: 250px
+}
+
+#logo {
+    width: 100px;
+    margin-bottom: 10px;
+}
+
+#api-key, #structure-id, #dropdown, #submit-button, #question-text, #clear-memory {
+    margin: 5px 0;
+    padding: 5px;
+    width: 80%;
+}
+
+#question-text {
+    display: none; /* Initially hidden */
+}
+
+#clear-memory {
+    display: none; /* Initially hidden */
+}
+
+#content-area {
+    margin-top: 10px;
+    width: 100%;
+    height: 300px;
+    overflow-y: auto;
+    background-color: #333;
+    padding: 10px;
+    box-sizing: border-box;
+    white-space: pre-line;
+}
+
+#text-size-controls {
+    display: flex;
+    justify-content: right;
+    width: 95%;
+    margin-top: 10px;
+}
+
+#text-size-controls button {
+    padding: 5px 10px;
+    font-size: 12px;
+    background-color: #555;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#text-size-controls button:hover {
+    background-color: #777;
+
+input[type="password"] {
+    font-family: Arial, sans-serif;
+    -webkit-text-security: disc; /* Ensures dots are displayed in WebKit browsers */
+}

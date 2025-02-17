@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Griptape Extension</title>
+    <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+    <div id="panel">
+        <img src="../images/logo.png" alt="Griptape Logo" id="logo">
+        <input type="password" id="api-key" placeholder="Enter Griptape Cloud API key">
+        <input type="text" id="structure-id" placeholder="Enter Griptape Cloud Structure ID">
+        <select id="dropdown">
+            <option value="question">Ask a Question</option>
+            <option value="quiz-me">Quiz Me</option>
+            <option value="write-poem">Write Poem</option>
+        </select>
+        <input type="text" id="question-text" placeholder="Enter question">
+        <button id="clear-memory">Reset Quiz</button>
+        <button id="submit-button">Submit</button>
+        <div id="content-area"></div>
+        <div id="text-size-controls">
+            <button id="increase-text-size">A+</button>
+            <button id="decrease-text-size">A-</button>
+        </div>
+    </div>
+    <script src="panel.js"></script>
+</body>
+</html>
