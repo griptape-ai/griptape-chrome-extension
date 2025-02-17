@@ -1,3 +1,24 @@
+// save setting to local memory (not synced)
+function saveSetting(settingName, settingValue) {
+    chrome.storage.local.set({ [settingName]: settingValue }, function () {
+        console.log('Setting saved:', settingName, settingValue);
+    });
+}
+
+// load setting from local memory
+function loadSetting(settingName, callback) {
+    chrome.storage.local.get([settingName], function (result) {
+        if (result[settingName] !== undefined) {
+            const savedValue = result[settingName];
+            console.log('Setting loaded:', settingName, savedValue);
+            callback(savedValue);
+        } else {
+            console.log('Setting not found:', settingName);
+            callback(null);
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => { // set up all our listeners
     const apiKeyInput = document.getElementById('api-key');
     const structureIdInput = document.getElementById('structure-id');
@@ -10,6 +31,19 @@ document.addEventListener('DOMContentLoaded', () => { // set up all our listener
     const decreaseTextSizeButton = document.getElementById('decrease-text-size');
 
     const griptapeApiUrl = 'https://cloud.griptape.ai/api';
+
+    // load the settings if they have been previously saved
+    loadSetting('apiKey', (value) => {
+        if (value !== null) {
+            apiKeyInput.value = value;
+        }
+    });
+
+    loadSetting('structureId', (value) => {
+        if (value !== null) {
+            structureIdInput.value = value;
+        }
+    });
 
     // Toggle visibility of question text input based on dropdown selection
     dropdown.addEventListener('change', () => {
@@ -51,6 +85,10 @@ document.addEventListener('DOMContentLoaded', () => { // set up all our listener
         const selectedOption = dropdown.value;
         const structureId = structureIdInput.value;
         const questionText = questionTextInput.value;
+
+        // Save API Key and Structure ID when the user submits
+        saveSetting('apiKey', apiKey);
+        saveSetting('structureId', structureId);
 
         chrome.runtime.sendMessage({ action: 'getPageContent' }, async (response) => {
             if (response && response.content) {
@@ -95,10 +133,10 @@ document.addEventListener('DOMContentLoaded', () => { // set up all our listener
     async function runStructure(prompt, apiKey, structureId, griptapeApiUrl) {
         try {
             // Initialize the Griptape API client and create a structure run
-            const runId = await createStructureRun({"args": [prompt]}, apiKey, structureId, griptapeApiUrl);
+            const runId = await createStructureRun({ "args": [prompt] }, apiKey, structureId, griptapeApiUrl);
             // print the run ID for debugging
             console.log('Run created:', runId);
-            
+
             // Poll the event endpoint for the status of the run
             let result;
             let finished = false;
@@ -106,27 +144,27 @@ document.addEventListener('DOMContentLoaded', () => { // set up all our listener
             let waitingForFirstChunk = true;
             do {
                 result = await pollEventEndpoint(runId, offset, apiKey, griptapeApiUrl);
-                if (waitingForFirstChunk) {contentArea.innerHTML += '.'}; // append . to the initial text in the content area to indicate that we are polling
+                if (waitingForFirstChunk) { contentArea.innerHTML += '.' }; // append . to the initial text in the content area to indicate that we are polling
                 offset = result.next_offset;
                 result.events.forEach(event => {
                     if (event.type === "TextChunkEvent") { // we got our first TextChunkEvent with content
-                        if (waitingForFirstChunk) {contentArea.innerHTML += '\n\n'}; // add two newlines
+                        if (waitingForFirstChunk) { contentArea.innerHTML += '\n\n' }; // add two newlines
                         waitingForFirstChunk = false; // no more waiting for the first chunk, so no more . character will be appended
                         contentArea.innerHTML += event.payload.token; // append the payload.token content to the HTML in the content area
                     }
                 });
                 await new Promise(resolve => setTimeout(resolve, 250)); // Wait before next poll .25 seconds
-                if (result.events.length > 0) { 
+                if (result.events.length > 0) {
                     if (result.events[result.events.length - 1].type === 'StructureRunCompleted') { // check whether the event type indicates that we're done
                         finished = true
                     };
                 }
             } while (finished === false);
-            
+
             const output = await getStructureRunOutput(runId, apiKey, griptapeApiUrl); // get the complete output
-    
+
             return output.output.value; // return the complete output
-    
+
         } catch (error) {
             console.error('Error:', error.message);
         }
@@ -139,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => { // set up all our listener
             url.search = new URLSearchParams({
                 'path': JSON.stringify({ 'structure_id': `${structureId}` })
             });
-    
+
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -148,11 +186,11 @@ document.addEventListener('DOMContentLoaded', () => { // set up all our listener
                 },
                 body: JSON.stringify(data)
             });
-    
+
             if (!response.ok) {
                 throw new Error(`Error creating structure run: ${response.statusText}`);
             }
-    
+
             const responseData = await response.json();
             return responseData.structure_run_id;
         } catch (error) {
@@ -160,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => { // set up all our listener
             throw error;
         }
     }
-    
+
     // poll for the status of a Structure run that is in progress
     async function pollEventEndpoint(runId, offset, apiKey, griptapeApiUrl) {
         try {
@@ -169,18 +207,18 @@ document.addEventListener('DOMContentLoaded', () => { // set up all our listener
                 'offset': offset,
                 'limit': 100
             });
-    
+
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${apiKey}`
                 }
             });
-    
+
             if (!response.ok) {
                 throw new Error(`Error polling event endpoint: ${response.statusText}`);
             }
-    
+
             const responseData = await response.json();
             return responseData;
         } catch (error) {
@@ -188,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => { // set up all our listener
             throw error;
         }
     }
-    
+
     // get the output from a completed Structure run
     async function getStructureRunOutput(runId, apiKey, griptapeApiUrl) {
         try {
@@ -200,11 +238,11 @@ document.addEventListener('DOMContentLoaded', () => { // set up all our listener
                     'Content-Type': 'application/json'
                 }
             });
-    
+
             if (!response.ok) {
                 throw new Error(`Error getting run detail: ${response.statusText}`);
             }
-    
+
             const responseData = await response.json();
             return responseData;
         } catch (error) {
@@ -227,11 +265,11 @@ document.addEventListener('DOMContentLoaded', () => { // set up all our listener
                     'Content-Type': 'application/json'
                 }
             });
-    
+
             if (!response.ok) {
                 throw new Error(`Error getting conversation memory ID: ${response.statusText}`);
             }
-    
+
             const responseData = await response.json();
             return responseData.threads[0].thread_id;
         } catch (error) {
@@ -239,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => { // set up all our listener
             throw error;
         }
     }
-    
+
     // delete a Thread by ID
     async function deleteThreadById(threadId, apiKey, griptapeApiUrl) {
         try {
@@ -251,18 +289,18 @@ document.addEventListener('DOMContentLoaded', () => { // set up all our listener
                     'Content-Type': 'application/json'
                 }
             });
-    
+
             if (!response.ok) {
                 throw new Error(`Error deleting thread with ID: ${response.statusText}`);
             }
-    
+
             return true;
         } catch (error) {
             console.error('Error deleting thread with ID:', error);
             throw error;
         }
     }
-    
+
     // combine functions to delete a Thead using its Alias
     async function deleteThreadByAlias(alias, apiKey, griptapeApiUrl) {
         try {
@@ -306,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => { // set up all our listener
         } catch (error) {
             contentArea.innerHTML = ('Error running Structure:', error);
             return 'Error fetching converted content';
-        } ; 
+        };
     }
 
     // update the HTML in content area
