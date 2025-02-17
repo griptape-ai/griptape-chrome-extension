@@ -21,10 +21,42 @@ body {
     margin-bottom: 10px;
 }
 
-#api-key, #structure-id, #dropdown, #submit-button, #question-text, #clear-memory {
+#submit-button {
     margin: 5px 0;
     padding: 5px;
     width: 95%;
+}
+
+
+#api-key, #structure-id, #dropdown, #question-text, #clear-memory {
+    margin: 5px 0;
+    padding: 5px;
+    width: 95%;
+    box-sizing: border-box;
+    background-color: #444;
+    border: 1px solid #666;
+    color:white;
+}
+
+#api-key:hover, #structure-id:hover, #question-text:hover, #api-key:focus, #structure-id:focus, #question-text:focus {
+    outline: 1px solid #aaa;
+}
+
+#dropdown {
+    appearance: none; /* Remove default dropdown styling */
+    -webkit-appearance: none; /* For Safari */
+    -moz-appearance: none; /* For Firefox */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath fill='white' d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 5px center;
+    padding-right: 25px;
+    background-color: #444;
+    border: 1px solid #666; 
+    color:white;
+}
+
+#dropdown:hover, #dropdown:focus {
+    outline: 1px solid #aaa;
 }
 
 #question-text {
