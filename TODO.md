@@ -8,6 +8,7 @@ Griptape Chrome Extension
 
 
 ### Completed Column ✓
+- [x] Switch event handling from polling to SSE
 - [x] Write docs/guide for backend deployment
 - [x] Add feature to clear conversation memory, resetting question generation for the Quiz Me action
 - [x] Add buttons to adjust the size of the text in the content-area of the side panel 
