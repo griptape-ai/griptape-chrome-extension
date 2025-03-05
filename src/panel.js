@@ -240,34 +240,6 @@ document.addEventListener('DOMContentLoaded', () => { // set up all our listener
         }
     }
 
-    // poll for the status of a Structure run that is in progress
-    async function pollEventEndpoint(runId, offset, apiKey, griptapeApiUrl) {
-        try {
-            const url = new URL(`${griptapeApiUrl}/structure-runs/${runId}/events`);
-            url.search = new URLSearchParams({
-                'offset': offset,
-                'limit': 100
-            });
-
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`Error polling event endpoint: ${response.statusText}`);
-            }
-
-            const responseData = await response.json();
-            return responseData;
-        } catch (error) {
-            console.error('Error polling event endpoint:', error);
-            throw error;
-        }
-    }
-
     // get the output from a completed Structure run
     async function getStructureRunOutput(runId, apiKey, griptapeApiUrl) {
         try {
