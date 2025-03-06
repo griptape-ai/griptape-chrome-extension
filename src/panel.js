@@ -137,29 +137,7 @@ document.addEventListener('DOMContentLoaded', () => { // set up all our listener
             // print the run ID for debugging
             console.log('Run created:', runId);
 
-            // Poll the event endpoint for the status of the run
-            let result;
-            let finished = false;
-            let offset = 0;
-            let waitingForFirstChunk = true;
-            do {
-                result = await pollEventEndpoint(runId, offset, apiKey, griptapeApiUrl);
-                if (waitingForFirstChunk) { contentArea.innerHTML += '.' }; // append . to the initial text in the content area to indicate that we are polling
-                offset = result.next_offset;
-                result.events.forEach(event => {
-                    if (event.type === "TextChunkEvent") { // we got our first TextChunkEvent with content
-                        if (waitingForFirstChunk) { contentArea.innerHTML += '\n\n' }; // add two newlines
-                        waitingForFirstChunk = false; // no more waiting for the first chunk, so no more . character will be appended
-                        contentArea.innerHTML += event.payload.token; // append the payload.token content to the HTML in the content area
-                    }
-                });
-                await new Promise(resolve => setTimeout(resolve, 250)); // Wait before next poll .25 seconds
-                if (result.events.length > 0) {
-                    if (result.events[result.events.length - 1].type === 'StructureRunCompleted') { // check whether the event type indicates that we're done
-                        finished = true
-                    };
-                }
-            } while (finished === false);
+            const result = await listenForEvents(runId, apiKey, griptapeApiUrl);
 
             const output = await getStructureRunOutput(runId, apiKey, griptapeApiUrl); // get the complete output
 
@@ -199,30 +177,78 @@ document.addEventListener('DOMContentLoaded', () => { // set up all our listener
         }
     }
 
-    // poll for the status of a Structure run that is in progress
-    async function pollEventEndpoint(runId, offset, apiKey, griptapeApiUrl) {
+    // listen for events from a Structure run that is in progress
+    async function listenForEvents(runId, apiKey, griptapeApiUrl) { 
         try {
-            const url = new URL(`${griptapeApiUrl}/structure-runs/${runId}/events`);
-            url.search = new URLSearchParams({
-                'offset': offset,
-                'limit': 100
-            });
-
-            const response = await fetch(url, {
-                method: 'GET',
+            const response = await fetch(`${griptapeApiUrl}/structure-runs/${runId}/events/stream`, { 
+                method: "GET", 
                 headers: {
-                    'Authorization': `Bearer ${apiKey}`
-                }
+                'Authorization': `Bearer ${apiKey}`
+                } 
             });
-
-            if (!response.ok) {
-                throw new Error(`Error polling event endpoint: ${response.statusText}`);
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder("utf-8");
+            let concatenatedText = "";
+            let buffer = "";
+            let waitingForFirstToken = true;
+    
+            function processBuffer(bufferStr) {
+                const parts = bufferStr.split("\n\n");
+                // Process complete events
+                for (let i = 0; i < parts.length - 1; i++) {
+                  processEvent(parts[i]);
+                }
+                // Return last (possibly incomplete) part
+                return parts[parts.length - 1];
             }
+    
+            function processEvent(eventStr) {
+                const lines = eventStr.split("\n");
+                let eventName = "";
+                let dataStr = "";
+                lines.forEach(line => {
+                    if (waitingForFirstToken) { contentArea.innerHTML += "." };
+                    if (line.startsWith("data:")) {
+                    dataStr += line.substring("data:".length).trim();
+                    const eventData = JSON.parse(dataStr);
+                    if (eventData.payload.token !== undefined) {
+                        if (waitingForFirstToken) {
+                            contentArea.innerHTML += "\n\n";
+                            waitingForFirstToken = false
+                        }
+                        contentArea.innerHTML += eventData.payload.token; 
+                        concatenatedText += eventData.payload.token;
+                    }
+                  }
+                });
+            }
+    
+            const TIMEOUT_MS = 15000; // Set timeout duration (15 seconds)
 
-            const responseData = await response.json();
-            return responseData;
+            try {
+                while (true) {
+                    const timeoutPromise = new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error("Read operation timed out")), TIMEOUT_MS)
+                    );
+
+                    const { value, done } = await Promise.race([reader.read(), timeoutPromise]);
+                    if (done) {
+                        if (buffer.length) {
+                        buffer = processBuffer(buffer);
+                        }
+                        console.log("\n\nStream complete\n");
+                        return concatenatedText;
+                    }
+                    buffer += decoder.decode(value)
+                    buffer = processBuffer(buffer);
+                }
+            }
+            catch (error) {
+                console.error("Loop exited due to:", error.message);
+                return concatenatedText;
+            }
         } catch (error) {
-            console.error('Error polling event endpoint:', error);
+            console.error('Error listening for events:', error);
             throw error;
         }
     }
